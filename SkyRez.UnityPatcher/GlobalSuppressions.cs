@@ -1,0 +1,6 @@
+﻿using System.Diagnostics.CodeAnalysis;
+
+[assembly: SuppressMessage("Style", "IDE0060:Удалите неиспользуемый параметр", Justification = "<Ожидание>", Scope = "member", Target = "~M:SkyRez.UnityPatcher.Program.SimpleStringProvider.GetTypeFromSpecification(System.Reflection.Metadata.MetadataReader,System.Reflection.Metadata.TypeSpecificationHandle,System.Byte)~System.String")]
+[assembly: SuppressMessage("Style", "IDE0060:Удалите неиспользуемый параметр", Justification = "<Ожидание>", Scope = "member", Target = "~M:SkyRez.UnityPatcher.Program.SimpleStringProvider.GetGenericInstantiation(System.String,System.Collections.Immutable.ImmutableArray{System.String})~System.String")]
+[assembly: SuppressMessage("Performance", "CA1822:Пометьте члены как статические", Justification = "<Ожидание>", Scope = "member", Target = "~M:SkyRez.UnityPatcher.Program.SimpleStringProvider.GetGenericInstantiation(System.String,System.Collections.Immutable.ImmutableArray{System.String})~System.String")]
+[assembly: SuppressMessage("Performance", "CA1822:Пометьте члены как статические", Justification = "<Ожидание>", Scope = "member", Target = "~M:SkyRez.UnityPatcher.Program.SimpleStringProvider.GetTypeFromSpecification(System.Reflection.Metadata.MetadataReader,System.Reflection.Metadata.TypeSpecificationHandle,System.Byte)~System.String")]

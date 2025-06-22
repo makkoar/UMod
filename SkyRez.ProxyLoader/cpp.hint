@@ -1,0 +1,2 @@
+#define SKYREZPROXYLOADER_API __declspec(dllexport)
+#define SKYREZPROXYLOADER_API __declspec(dllimport)

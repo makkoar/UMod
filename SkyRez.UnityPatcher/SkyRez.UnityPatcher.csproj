@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <Platforms>x64</Platforms>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Resources\DefaultConfig.ini" />
+    <None Remove="Resources\x64\version.dll" />
+    <None Remove="Resources\x64\version.exp" />
+    <None Remove="Resources\x64\version.lib" />
+    <None Remove="Resources\x64\version.pdb" />
+    <None Remove="Resources\x86\version.dll" />
+    <None Remove="Resources\x86\version.exp" />
+    <None Remove="Resources\x86\version.lib" />
+    <None Remove="Resources\x86\version.pdb" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\DefaultConfig.ini" />
+    <EmbeddedResource Include="Resources\x64\version.dll" />
+    <EmbeddedResource Include="Resources\x86\version.dll" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SkyRez.Common\SkyRez.Common.csproj" />
+  </ItemGroup>
+
+</Project>

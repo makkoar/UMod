@@ -1,0 +1,66 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36212.18
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SkyRez.UnityPatcher", "SkyRez.UnityPatcher\SkyRez.UnityPatcher.csproj", "{57D17B15-4C9F-4F42-AA88-A48134F4E02F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{061E177D-B63D-4163-8BB2-26AE38404300} = {061E177D-B63D-4163-8BB2-26AE38404300}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SkyRez.ProxyLoader", "SkyRez.ProxyLoader\SkyRez.ProxyLoader.vcxproj", "{061E177D-B63D-4163-8BB2-26AE38404300}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SkyRez.Translate", "SkyRez.Translate\SkyRez.Translate.csproj", "{5A455872-2082-44D9-B737-0FA40A7EABBB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SkyRez.Common", "SkyRez.Common\SkyRez.Common.csproj", "{48496611-6DEB-4373-B9C6-CC01E9423BC1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SkyRez.Common.3.5", "SkyRez.Common.3.5\SkyRez.Common.3.5.csproj", "{4D369018-2B9D-4CDE-B8E1-AE3407A13DCE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{57D17B15-4C9F-4F42-AA88-A48134F4E02F}.Debug|x64.ActiveCfg = Debug|x64
+		{57D17B15-4C9F-4F42-AA88-A48134F4E02F}.Debug|x86.ActiveCfg = Debug|x64
+		{57D17B15-4C9F-4F42-AA88-A48134F4E02F}.Release|x64.ActiveCfg = Release|x64
+		{57D17B15-4C9F-4F42-AA88-A48134F4E02F}.Release|x64.Build.0 = Release|x64
+		{57D17B15-4C9F-4F42-AA88-A48134F4E02F}.Release|x86.ActiveCfg = Release|x64
+		{57D17B15-4C9F-4F42-AA88-A48134F4E02F}.Release|x86.Build.0 = Release|x64
+		{061E177D-B63D-4163-8BB2-26AE38404300}.Debug|x64.ActiveCfg = Release|x64
+		{061E177D-B63D-4163-8BB2-26AE38404300}.Debug|x64.Build.0 = Release|x64
+		{061E177D-B63D-4163-8BB2-26AE38404300}.Debug|x86.ActiveCfg = Release|Win32
+		{061E177D-B63D-4163-8BB2-26AE38404300}.Debug|x86.Build.0 = Release|Win32
+		{061E177D-B63D-4163-8BB2-26AE38404300}.Release|x64.ActiveCfg = Release|x64
+		{061E177D-B63D-4163-8BB2-26AE38404300}.Release|x64.Build.0 = Release|x64
+		{061E177D-B63D-4163-8BB2-26AE38404300}.Release|x86.ActiveCfg = Release|Win32
+		{061E177D-B63D-4163-8BB2-26AE38404300}.Release|x86.Build.0 = Release|Win32
+		{5A455872-2082-44D9-B737-0FA40A7EABBB}.Debug|x64.ActiveCfg = Debug|x86
+		{5A455872-2082-44D9-B737-0FA40A7EABBB}.Debug|x86.ActiveCfg = Debug|x86
+		{5A455872-2082-44D9-B737-0FA40A7EABBB}.Release|x64.ActiveCfg = Release|x64
+		{5A455872-2082-44D9-B737-0FA40A7EABBB}.Release|x64.Build.0 = Release|x64
+		{5A455872-2082-44D9-B737-0FA40A7EABBB}.Release|x86.ActiveCfg = Release|x86
+		{5A455872-2082-44D9-B737-0FA40A7EABBB}.Release|x86.Build.0 = Release|x86
+		{48496611-6DEB-4373-B9C6-CC01E9423BC1}.Debug|x64.ActiveCfg = Debug|x64
+		{48496611-6DEB-4373-B9C6-CC01E9423BC1}.Debug|x86.ActiveCfg = Debug|x64
+		{48496611-6DEB-4373-B9C6-CC01E9423BC1}.Release|x64.ActiveCfg = Release|x64
+		{48496611-6DEB-4373-B9C6-CC01E9423BC1}.Release|x64.Build.0 = Release|x64
+		{48496611-6DEB-4373-B9C6-CC01E9423BC1}.Release|x86.ActiveCfg = Release|x64
+		{48496611-6DEB-4373-B9C6-CC01E9423BC1}.Release|x86.Build.0 = Release|x64
+		{4D369018-2B9D-4CDE-B8E1-AE3407A13DCE}.Debug|x64.ActiveCfg = Debug|x64
+		{4D369018-2B9D-4CDE-B8E1-AE3407A13DCE}.Debug|x86.ActiveCfg = Debug|x86
+		{4D369018-2B9D-4CDE-B8E1-AE3407A13DCE}.Release|x64.ActiveCfg = Release|x64
+		{4D369018-2B9D-4CDE-B8E1-AE3407A13DCE}.Release|x64.Build.0 = Release|x64
+		{4D369018-2B9D-4CDE-B8E1-AE3407A13DCE}.Release|x86.ActiveCfg = Release|x86
+		{4D369018-2B9D-4CDE-B8E1-AE3407A13DCE}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6B7EF5FB-C36F-452D-B264-B62D4D0DA392}
+	EndGlobalSection
+EndGlobal
