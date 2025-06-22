@@ -1,187 +1,115 @@
-﻿namespace SkyRez.Translator // Убедитесь, что пространство имен верное
+﻿namespace SkyRez.Translate;
+
+/// <summary>Статический класс, отвечающий за инициализацию и загрузку мода.</summary>
+/// <remarks>Вызывается из <see cref="ComBridge"/>.</remarks>
+public static class PluginEntry
 {
-    public static class PluginEntry
+    #region Приватные поля
+
+    /// <summary>Тип основного класса мода, который будет инстанцирован и загружен.</summary>
+    /// <value>Должен быть тип, унаследованный от <see cref="SkyRezMod"/>.</value>
+    private static readonly Type modType = typeof(TranslatorModule);
+
+    /// <summary>Экземпляр загруженного мода.</summary>
+    private static SkyRezMod modInstance;
+
+    #endregion
+
+    #region Инициализация
+
+    /// <summary>Основной метод инициализации мода.</summary>
+    /// <remarks>Настраивает инфраструктуру (PathResolver, ConfigManager, Logger) и загружает мод.</remarks>
+    public static void Initialize()
     {
-        private static readonly Type ModType = typeof(TranslatorModule); // Убедитесь, что TranslatorModule существует в этом пространстве имен
-        private static SkyRezMod modInstance; // Убрал '_' для соответствия вашему стилю
-
-        // Переменные для отладочного лога
-        private static string debugRootPathForLogs;
-        private static string debugLogFilePath;
-
-        static PluginEntry() // Статический конструктор для инициализации путей к логам один раз
+        try
         {
-            try
-            {
-                // AppDomain.CurrentDomain.BaseDirectory здесь будет [GameName]_Data/
-                string dataDir = AppDomain.CurrentDomain.BaseDirectory;
-                debugRootPathForLogs = Directory.GetParent(dataDir)?.FullName ?? dataDir; // Если нет родителя, пишем в _Data
-                debugLogFilePath = Path.Combine(debugRootPathForLogs, "PLUGIN_ENTRY_DEBUG.txt");
-
-                // Очищаем лог при первой загрузке класса
-                File.WriteAllText(debugLogFilePath, "--- PluginEntry Debug Log Session Started ---\r\n");
-            }
-            catch
-            {
-                // Если даже тут ошибка, ничего не поделать
-            }
+            if (!SetupInfrastructure()) return;
+            LoadMod();
         }
-
-        private static void WriteDebugLog(string message)
+        catch (Exception ex)
         {
-            try
-            {
-                File.AppendAllText(debugLogFilePath, DateTime.Now.ToString("HH:mm:ss.fff") + ": " + message + "\r\n");
-            }
-            catch { /* Игнорируем ошибки записи в дебаг лог */ }
-        }
-
-        public static void Initialize()
-        {
-            WriteDebugLog("Initialize() - START");
-            try
-            {
-                if (!SetupInfrastructure())
-                {
-                    WriteDebugLog("Initialize() - SetupInfrastructure FAILED. Exiting.");
-                    return;
-                }
-                WriteDebugLog("Initialize() - SetupInfrastructure SUCCEEDED.");
-                LoadMod();
-                WriteDebugLog("Initialize() - LoadMod CALLED.");
-            }
-            catch (Exception ex)
-            {
-                WriteDebugLog("Initialize() - CRITICAL EXCEPTION: " + ex.ToString());
-                // Попробуем записать в аварийный лог, если основной еще не работает
-                try
-                {
-                    string emergencyLogPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "EMERGENCY_LOG.txt");
-                    File.AppendAllText(emergencyLogPath, DateTime.Now + ": КРИТИЧЕСКАЯ ОШИВКА в PluginEntry.Initialize: \r\n" + ex.ToString() + "\r\n");
-                }
-                catch { }
-            }
-            WriteDebugLog("Initialize() - END");
-        }
-
-        private static bool SetupInfrastructure()
-        {
-            WriteDebugLog("SetupInfrastructure() - START");
-            try
-            {
-                // AppDomain.CurrentDomain.BaseDirectory здесь будет [GameName]_Data/
-                string baseDataDirectory = AppDomain.CurrentDomain.BaseDirectory;
-                WriteDebugLog("baseDataDirectory (AppDomain.CurrentDomain.BaseDirectory) = " + baseDataDirectory);
-
-                // Получаем корневую папку игры, поднявшись на один уровень от папки _Data
-                string gameRootPath = Directory.GetParent(baseDataDirectory)?.FullName;
-                if (string.IsNullOrEmpty(gameRootPath))
-                {
-                    WriteDebugLog("SetupInfrastructure() - ERROR - Could not get gameRootPath from baseDataDirectory parent. baseDataDirectory was: " + baseDataDirectory);
-                    return false;
-                }
-                WriteDebugLog("gameRootPath = " + gameRootPath);
-
-                // Имя исполняемого файла игры (без .exe)
-                string gameExePath = Directory.GetFiles(gameRootPath, "*.exe").FirstOrDefault();
-                if (string.IsNullOrEmpty(gameExePath))
-                {
-                    WriteDebugLog("SetupInfrastructure() - ERROR - gameExePath is null or empty in gameRootPath: " + gameRootPath);
-                    return false;
-                }
-                WriteDebugLog("gameExePath = " + gameExePath);
-
-                string gameName = Path.GetFileNameWithoutExtension(gameExePath);
-                WriteDebugLog("gameName (from exe) = " + gameName);
-
-                // Формируем ожидаемое имя папки _Data (например, "DevilLegion_Data")
-                string expectedUnityDataFolderName = gameName + "_Data";
-                WriteDebugLog("expectedUnityDataFolderName (constructed from gameName) = " + expectedUnityDataFolderName);
-
-                WriteDebugLog("Initializing PathResolver...");
-                // Передаем в PathResolver имя игры и ОЖИДАЕМОЕ имя папки _Data
-                // PathResolver будет использовать 'expectedUnityDataFolderName' при замене плейсхолдера {Data}
-                PathResolver.Initialize(gameRootPath, gameName, expectedUnityDataFolderName);
-                WriteDebugLog("PathResolver INITIALIZED. GameName: " + gameName + ", DataFolder (for {Data} placeholder): " + expectedUnityDataFolderName);
-
-                // Формируем путь к файлу конфигурации, используя плейсхолдер {Data}
-                // Патчер кладет SkyRez.Config.ini в папку [GameName]_Data/
-                string configFileName = "SkyRez.Config.ini";
-                string configPathPattern = Path.Combine("{Data}", configFileName); // "{Data}\SkyRez.Config.ini"
-                WriteDebugLog("Config path pattern for Resolver = " + configPathPattern);
-
-                string resolvedConfigPath = PathResolver.Resolve(configPathPattern);
-                WriteDebugLog("Resolved configPath by PathResolver = " + resolvedConfigPath);
-                // Ожидаемый путь: D:\User\Downloads\Attack.it.Devil.legion.v1.22\DevilLegion_Data\SkyRez.Config.ini
-
-                WriteDebugLog("Loading ConfigManager with path: " + resolvedConfigPath);
-                ConfigManager.Load(resolvedConfigPath);
-                WriteDebugLog("ConfigManager LOADED. IsLoaded: " + ConfigManager.IsLoaded);
-
-                WriteDebugLog("Initializing Logger...");
-                Logger.Initialize(); // Logger прочитает настройки, включая LogPath, из ConfigManager
-                WriteDebugLog("Logger INITIALIZED. LoggingEnabled from config: " + ConfigManager.GetBool("EnableLogging", false) +
-                              ", Resolved LogPath by Logger: " + (Logger.IsInitialized ? " (Logger uses its internal LogPath)" : "N/A - Logger not fully init if config failed"));
-
-
-                if (ConfigManager.IsLoaded && ConfigManager.GetBool("EnableLogging", true)) // По умолчанию EnableLogging = true
-                {
-                    Logger.Information("================================================");
-                    Logger.Information("    Загрузчик модов SkyRez инициализирован (из PluginEntry)");
-                    Logger.Information("    Версия Runtime: .NET " + Environment.Version.ToString());
-                    Logger.Information("    Файл конфигурации успешно загружен. Путь: " + resolvedConfigPath);
-                    Logger.Information("================================================");
-                    WriteDebugLog("Main logger has written initial messages.");
-                }
-                else
-                {
-                    WriteDebugLog("Основной логгер НЕ будет писать, так как EnableLogging=false или файл конфигурации не найден/не загружен.");
-                    if (!ConfigManager.IsLoaded)
-                    {
-                        WriteDebugLog("Причина: ConfigManager.IsLoaded is False. Файл конфигурации не найден по пути: " + resolvedConfigPath);
-                    }
-                    else if (!ConfigManager.GetBool("EnableLogging", true))
-                    {
-                        WriteDebugLog("Причина: EnableLogging в конфигурации установлен в false.");
-                    }
-                }
-                WriteDebugLog("Main logger messages written (or skipped based on config).");
-                WriteDebugLog("SetupInfrastructure() - SUCCEEDED");
-                return true;
-            }
-            catch (Exception ex)
-            {
-                WriteDebugLog("SetupInfrastructure() - EXCEPTION: " + ex.ToString());
-                return false;
-            }
-        }
-
-        private static void LoadMod()
-        {
-            WriteDebugLog("LoadMod() - START");
-            try
-            {
-                if (!typeof(SkyRezMod).IsAssignableFrom(ModType))
-                {
-                    Logger.Error("Тип '" + ModType.FullName + "' не является наследником SkyRezMod.");
-                    WriteDebugLog("LoadMod() - ERROR - ModType not assignable from SkyRezMod: " + ModType.FullName);
-                    return;
-                }
-                Logger.Information("Найден класс мода: " + ModType.FullName);
-                WriteDebugLog("LoadMod() - Mod class found: " + ModType.FullName);
-
-                modInstance = (SkyRezMod)Activator.CreateInstance(ModType);
-                WriteDebugLog("LoadMod() - Mod instance created.");
-
-                modInstance.OnLoad();
-                WriteDebugLog("LoadMod() - modInstance.OnLoad() CALLED.");
-            }
-            catch (Exception ex)
-            {
-                Logger.Error(ex, "Ошибка при загрузке или инициализации модуля мода.");
-                WriteDebugLog("LoadMod() - EXCEPTION: " + ex.ToString());
-            }
-            WriteDebugLog("LoadMod() - END");
+            Logger.Error(ex, "КРИТИЧЕСКАЯ ОШИБКА верхнего уровня в PluginEntry.Initialize()");
         }
     }
+
+    /// <summary>Настраивает основные компоненты инфраструктуры мода: <see cref="PathResolver"/>, <see cref="ConfigManager"/> и <see cref="Logger"/>.</summary>
+    /// <returns><c>true</c> если инициализация прошла успешно, иначе <c>false</c>.</returns>
+    private static bool SetupInfrastructure()
+    {
+        try
+        {
+            string baseDataDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            string gameRootPath = Directory.GetParent(baseDataDirectory)?.FullName;
+
+            if (string.IsNullOrEmpty(gameRootPath)) return false;
+
+            string gameExePath = Directory.GetFiles(gameRootPath, "*.exe")
+                .FirstOrDefault(exe => !Path.GetFileNameWithoutExtension(exe).StartsWith("SkyRez.UnityPatcher", StringComparison.OrdinalIgnoreCase));
+
+            if (string.IsNullOrEmpty(gameExePath)) return false;
+            string gameName = Path.GetFileNameWithoutExtension(gameExePath);
+            string expectedUnityDataFolderName = gameName + "_Data";
+
+            PathResolver.Initialize(gameRootPath, gameName, expectedUnityDataFolderName);
+
+            string configFileName = "SkyRez.Config.ini";
+            string configPathPattern = Path.Combine("{Data}", configFileName);
+            string resolvedConfigPath = PathResolver.Resolve(configPathPattern);
+
+            ConfigManager.Load(resolvedConfigPath);
+            Logger.Initialize();
+
+            Logger.Information("================================================");
+            Logger.Information("    Загрузчик модов SkyRez (PluginEntry)");
+            Logger.Information($"    Время инициализации: {DateTime.Now:dd.MM.yyyy HH:mm:ss}");
+            Logger.Information($"    Корневая папка игры: {gameRootPath}");
+            Logger.Information($"    Имя игры (из exe): {gameName}");
+            Logger.Information($"    Папка данных игры ({{Data}}): {expectedUnityDataFolderName}");
+            Logger.Information($"    Путь к файлу конфигурации: {resolvedConfigPath}");
+            Logger.Information($"    Конфигурация загружена: {ConfigManager.IsLoaded}");
+            Logger.Information($"    Логирование в файл включено: {Logger.IsLoggingToFileEnabled}");
+            Logger.Information($"    Версия Runtime: .NET {Environment.Version}");
+            Logger.Information("================================================");
+
+            if (!ConfigManager.IsLoaded)
+                Logger.Warning("Файл конфигурации не найден или не удалось загрузить. Используются значения по умолчанию.");
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Logger.Error(ex, "КРИТИЧЕСКАЯ ОШИБКА при настройке инфраструктуры в PluginEntry.SetupInfrastructure()");
+            return false;
+        }
+    }
+
+    /// <summary>Загружает и инициализирует основной модуль мода.</summary>
+    /// <remarks>Создает экземпляр типа, указанного в <see cref="modType"/>, и вызывает его метод OnLoad().</remarks>
+    private static void LoadMod()
+    {
+        Logger.Debug($"LoadMod() - НАЧАЛО. Тип мода: {modType.FullName}");
+        try
+        {
+            if (!typeof(SkyRezMod).IsAssignableFrom(modType))
+            {
+                Logger.Error($"Тип '{modType.FullName}' не является наследником SkyRezMod. Мод не будет загружен.");
+                return;
+            }
+
+            Logger.Information($"Создание экземпляра мода: {modType.FullName}...");
+            modInstance = (SkyRezMod)Activator.CreateInstance(modType);
+            Logger.Debug("Экземпляр мода создан.");
+
+            Logger.Information($"Вызов OnLoad() для мода '{modInstance.Name}' версии {modInstance.Version}...");
+            modInstance.OnLoad();
+            Logger.Information($"Мод '{modInstance.Name}' успешно загружен и инициализирован.");
+        }
+        catch (Exception ex)
+        {
+            Logger.Error(ex, $"КРИТИЧЕСКАЯ ОШИБКА при загрузке или инициализации модуля мода '{modType.FullName}'.");
+        }
+        Logger.Debug("LoadMod() - КОНЕЦ");
+    }
+
+    #endregion
 }
