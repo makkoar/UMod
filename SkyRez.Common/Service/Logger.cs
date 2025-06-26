@@ -1,4 +1,5 @@
-﻿// Файл: SkyRez.Common/Logger.cs
+﻿namespace SkyRez.Common.Service;
+
 public static class Logger
 {
     [DllImport("kernel32.dll")]
@@ -47,22 +48,16 @@ public static class Logger
                     try
                     {
                         if (PathResolver.IsInitialized) // Если PathResolver готов (например, это не патчер, а другой инструмент)
-                        {
                             resolvedLogPath = PathResolver.Resolve(rawLogPathFromConfig);
-                        }
                         else // PathResolver не готов (стандартная ситуация для патчера)
-                        {
                             // Используем путь "как есть", но делаем его абсолютным относительно текущей директории патчера
                             resolvedLogPath = Path.IsPathRooted(rawLogPathFromConfig)
                                 ? rawLogPathFromConfig
                                 : Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, rawLogPathFromConfig));
-                        }
 
                         string logDirectory = Path.GetDirectoryName(resolvedLogPath);
                         if (!string.IsNullOrEmpty(logDirectory) && !Directory.Exists(logDirectory))
-                        {
                             Directory.CreateDirectory(logDirectory);
-                        }
                         // При инициализации создаем/перезаписываем файл лога
                         File.WriteAllText(resolvedLogPath, $"--- Сессия логирования начата в {DateTime.Now} ---\r\n");
                     }
@@ -80,9 +75,7 @@ public static class Logger
                     }
                 }
                 else
-                {
                     resolvedLogPath = null; // Логирование в файл отключено в конфиге
-                }
             }
             isInitialized = true;
         }
@@ -129,10 +122,8 @@ public static class Logger
             string logEntry = $"[{timestamp}] {state} [{source}]: {message}\r\n";
 
             if (loggingEnabled && !string.IsNullOrEmpty(resolvedLogPath))
-            {
                 try { File.AppendAllText(resolvedLogPath, logEntry); }
                 catch { /* Тихо игнорируем ошибки записи */ }
-            }
 
             if (consoleEnabled)
             {
