@@ -104,7 +104,7 @@ internal static class TextSetterPatch
                 Logger.Information($"Текст '{originalValue}' заменен на '{value}'.");
                 break;
             default:
-                // Logger.Debug($"Текст \"{originalValue}\" не требует замены."); // Раскомментировать для отладки всех текстов
+                Logger.Debug($"Текст \"{originalValue}\" не требует замены.");
                 break;
         }
     }
